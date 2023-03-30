@@ -1,0 +1,18 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{%block title%} {%endblock title%}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    {% include 'static_sources/allCss.html' %}
+  </head>
+  <body>
+    <div class="page_loader"></div>
+    {% include 'shared/header.html'%} 
+    {% include 'shared/navbar.html'%} {% block content %} 
+    {% endblock %} {% include 'shared/footer.html' %} 
+    {% include 'static_sources/allJs.html'   %}
+  </body>
+</html>

@@ -21,5 +21,8 @@ class Team(models.Model):
     googleplus_link = models.URLField(max_length=200)
     created_date = models.DateField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return self.first_name + ' ' + self.last_name

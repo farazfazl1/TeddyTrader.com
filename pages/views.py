@@ -1,12 +1,18 @@
 from django.shortcuts import render
 from .models import Team
+from teddyBears.models import TeddyBear
 
 
 def home(req):
     team_data = Team.objects.all()
+    teddy_bear_data = TeddyBear.objects.all()
+    featured_teddy_bears = TeddyBear.objects.order_by(
+        '-created_date').filter(is_featured=True)
 
     context = {
-        'Team': team_data
+        'Team': team_data,
+        'TeddyBear': teddy_bear_data,
+        'Featured': featured_teddy_bears,
     }
     return render(req, 'pages/home.html', context)
 

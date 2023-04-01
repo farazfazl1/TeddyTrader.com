@@ -93,3 +93,62 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Team, TeamAdmin)
+----------------------------------------------------------------------
+Lets make some stuff dynamic
+in our footer
+<p class="copy">
+              © {% now 'Y'%} <a href="#">Carzone Corp.</a> All Rights Reserved.
+            </p>
+we made year with django now 'Y' to change year every year automatically
+
+----------------------------------------------------------------------
+DYNAMIC HIGHLIGHT. It will keep the link highlighet till we leave that page
+          <li class="nav-item">
+            <a 
+            {% if '/' == request.path %}
+              class="nav-link active"
+            {%else%}
+              class="nav-link"
+            {% endif %}
+            href="{% url 'pages:home' %}">
+              Home
+            </a>
+          </li>
+I did it for all other links. Located in shared/navbar.html
+----------------------------------------------------------------------
+Now we are going to create an APp for our TeddyBear FUNCTIONALITTY
+----------------------------------------------------------------------
+We are going to do 2 things. 
+First implemnent a rich text editor for description for Teddy TeddyBear
+Second To allow the features option to choose mulutple features from the given
+Featuers
+
+for editor
+we install pip install django-ckeditor
+Then SETTINGS.py, INSTALLED_APPS -> ADD 'ckeditor'
+Then models we switched our TextField to RichTextField in description 
+and imported 
+from ckeditor.fields import RichTextField
+Then you write
+description = RichTextField(blank=False)
+
+Now to use multi Featuers
+pip install django-multiselectfield
+you have to impoirt a package called
+from multiselectfield import MultiSelectField
+----------------------------------------------------------------------
+Ok for better admin experience, we want to make the is_featured editable when
+we display all databases
+    list_editable = ('is_featued') in admin.py
+----------------------------------------------------------------------
+We want our numbers to be a bit better readible therefore we want to use
+a djangoo package called humanize
+django.contrib.humanize
+
+Add this to INSTALLED_APPS -> 'django.contrib.humanize'
+once it is done, we go to html page and were we want our particialr number to be shown
+<span>${{teddybear.price | intcomma}}</span>
+we also {% extends 'base.html' %} {% block title %}Home Page{% endblock title %}
+{% block content %} {% load humanize %}{% load static %} load humanize on that specfic html page
+it will turn $43000.00 to $43,000.00
+----------------------------------------------------------------------

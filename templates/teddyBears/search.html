@@ -1,0 +1,208 @@
+{% extends 'base.html' %} {% block title %}Search Page{% endblock title %} 
+{% block content %} {% load humanize %}{% load static %}
+
+<div class="sub-banner overview-bgi">
+  <div class="container breadcrumb-area">
+    <div class="breadcrumb-areas">
+      <h1>Search Results</h1>
+      <ul class="breadcrumbs">
+        <li><a href="{% url 'pages:home' %}">Home</a></li>
+        <li class="active">Search</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="search-box-3 sb-7 bg-active">
+  <div class="container">
+    <div class="search-area-inner">
+      <div class="search-contents">
+        <form action="{% url 'teddyBears:search' %}" method="GET">
+          <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6">
+              <div class="form-group">
+                <select class="selectpicker search-fields" name="brand">
+                  <option disabled="disabled" selected="selected">
+                    Select Brand
+                  </option>
+                  {% for brand in brand_search %}
+                  <option value="{{brand}}">{{brand}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6">
+              <div class="form-group">
+                <select class="selectpicker search-fields" name="year">
+                  <option disabled="disabled" selected="selected">
+                    Select Year
+                  </option>
+                  {% for year in year_search %}
+                  <option value="{{year}}">{{year}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6">
+              <div class="form-group">
+                <select class="selectpicker search-fields" name="condition">
+                  <option disabled="disabled" selected="selected">
+                    Select Condition
+                  </option>
+                  {% for condition in condition_search %}
+                  <option value="{{condition}}">{{condition}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6">
+              <div class="form-group">
+                <select class="selectpicker search-fields" name="tag">
+                  <option disabled="disabled" selected="selected">
+                    Select Tag
+                  </option>
+                  {% for tag in tag_search %}
+                  <option value="{{tag}}">{{tag}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="range-slider clearfix">
+              <label>Price</label>
+              <div
+                data-min="0"
+                data-max="297000"
+                data-min-name="min_price"
+                data-max-name="max_price"
+                data-unit="USD"
+                class="range-slider-ui ui-slider"
+                aria-disabled="false"
+              ></div>
+              <div class="clearfix"></div>
+            </div>
+            <div class="form-group mb-0">
+              <button class="search-button btn">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Full Page Search -->
+<div id="full-page-search">
+  <button type="button" class="close">×</button>
+  <form action="{% url 'teddyBears:search' %}" class="search-header">
+    <input
+      type="search"
+      value=""
+      placeholder="type keyword(s) here. Eg: audi, benz etc"
+      name="keyword"
+    />
+    <button type="submit" class="btn btn-sm button-theme">Search</button>
+  </form>
+</div>
+
+<div class="featured-car content-area">
+  <div class="container">
+    <!-- Main title -->
+    <div class="main-title">
+      <h1>Latest <span>Teddy Bears</span></h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    </div>
+    <div class="row">
+      {% for teddybear in TeddyBear %}
+      <div class="col-lg-4 col-md-6">
+        <div class="car-box">
+          <div class="car-thumbnail">
+            <a href="{% url 'teddyBears:teddy-bear' id=teddybear.id %}">
+              <div class="tag">{{teddybear.tag |title}}</div>
+              <img
+                class="d-block w-100"
+                src="{{teddybear.bear_photo.url}}"
+                alt="car"
+                style="min-height: 262px; max-height: 262px"
+              />
+              <div class="facilities-list clearfix">
+                <ul>
+                  <li>
+                    <span><i class="flaticon-calendar-1"></i></span>
+                    {{teddybear.year}}
+                  </li>
+                  <li>
+                    <span><i class="flaticon-manual-transmission"></i></span
+                    >{{teddybear.condition}}
+                  </li>
+                  <li>
+                    <span class="text-warning"
+                      ><i class="fas fa-bear"></i
+                    ></span>
+                    {{teddybear.color}}
+                  </li>
+                </ul>
+              </div>
+            </a>
+            <div class="carbox-overlap-wrapper">
+              <div class="overlap-box">
+                <div class="overlap-btns-area">
+                  <div class="car-magnify-gallery">
+                    <a href="{{teddybear.bear_photo.url}}" class="overlap-btn">
+                      <i class="fa fa-expand"></i>
+                      <img class="hidden" src="{{teddybear.bear_photo.url}}" />
+                    </a>
+                    {% if teddybear.bear_photo_1 %}
+                    <a href="{{teddybear.bear_photo_1.url}}">
+                      <img
+                        class="hidden"
+                        src="{{teddybear.bear_photo_1.url}}"
+                      />
+                    </a>
+                    {% endif %} {% if teddybear.bear_photo_2 %}
+                    <a href="{{teddybear.bear_photo_2.url}}">
+                      <img
+                        class="hidden"
+                        src="{{teddybear.bear_photo_2.url}}"
+                      />
+                    </a>
+                    {% endif %} {% if teddybear.bear_photo_3 %}
+                    <a href="{{teddybear.bear_photo_3.url}}">
+                      <img
+                        class="hidden"
+                        src="{{teddybear.bear_photo_3.url}}"
+                      />
+                    </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="detail">
+            <h1 class="title">
+              <a href="{% url 'teddyBears:teddy-bear' id=teddybear.id %}"
+                >{{teddybear.name}}</a
+              >
+            </h1>
+            <div class="location">
+              <a href="{% url 'teddyBears:teddy-bear' id=teddybear.id %}">
+                <i class="flaticon-pin"></i>{{teddybear.city}},
+                {{teddybear.state}}
+              </a>
+            </div>
+          </div>
+          <div class="footer clearfix">
+            <div class="pull-left ratings days">
+              <p class="cartype">{{teddybear.brand}}</p>
+            </div>
+            <div class="pull-right">
+              <p class="price">${{teddybear.price | intcomma}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{%endblock%}

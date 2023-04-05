@@ -125,6 +125,13 @@ class TeddyBear(models.Model):
         ('fair', 'Fair')
     ]
 
+    tag_choices = [
+        ('For Sale', 'For Sale'),
+        ('For Rent', 'For Rent'),
+        ('New Arrival', 'New Arrival'),
+        ('Limited Edition', 'Limited Edition'),
+    ]
+
     year_choice = []
     for r in range(1902, (datetime.now().year+1)):
         year_choice.append((r, r))
@@ -141,6 +148,8 @@ class TeddyBear(models.Model):
         max_length=50, choices=condition_choices, blank=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=False)
     description = RichTextField(blank=False)
+    tag = models.CharField(
+        max_length=50, choices=tag_choices, blank=False, null=True)
 
     # Teddy Bear Photos
     bear_photo = models.ImageField(

@@ -152,3 +152,210 @@ we also {% extends 'base.html' %} {% block title %}Home Page{% endblock title %}
 {% block content %} {% load humanize %}{% load static %} load humanize on that specfic html page
 it will turn $43000.00 to $43,000.00
 ----------------------------------------------------------------------
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+
+Pagination stpes
+def home(req):
+    teddybear_data = TeddyBear.objects.order_by('-created_date')
+    paginator = Paginator(teddybear_data, 6) #1
+    page = req.GET.get('page') #2
+    paged_teddy_bears = paginator.get_page(page) #3
+    
+    
+    context = {
+        'TeddyBear': paged_teddy_bears 
+          #4.passnig paged instead of original data
+        
+    }
+    return render(req, 'teddyBears/teddyBears.html', context)
+first we make paginator and put our data and how many data
+we want to show per Pagination
+then req.GET.get('page') retrieves the value of the page
+ parameter from the query string. This 
+parameter is usually used to specify the 
+page number of a paginated view.
+
+paginator.get_page(page) retrieves the page number 
+from the query string (retrieved in the first step), 
+and returns a Page object representing that page of data.
+
+ <!-- Page navigation start -->
+        <div class="pagination-box p-box-2 text-center">
+          <nav aria-label="Page navigation example">
+            {% if TeddyBear.has_other_pages %}
+            <ul class="pagination">
+              {% if TeddyBear.has_previous %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{TeddyBear.previous_page_number}}"
+                  ><i class="fa fa-angle-left"></i
+                ></a>
+              </li>
+              {%else%}
+              <li class="page-item disabled">
+                <a class="page-link"><i class="fa fa-angle-left"></i></a>
+              </li>
+              {% endif %} 
+              {%for i in TeddyBear.paginator.page_range%} 
+              {%if TeddyBear.number == i%}
+              <li class="page-item">
+                <a class="page-link active" href="page={{i}}">{{i}}</a>
+              </li>
+              {%else%}
+              <li class="page-item">
+                <a class="page-link" href="?page={{i}}">{{i}}</a>
+              </li>
+              {%endif%} 
+              {%endfor%}
+              {% if TeddyBear.has_next %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{TeddyBear.next_page_number}}"
+                  ><i class="fa fa-angle-right"></i
+                ></a>
+              </li>
+              {%else%}
+              <li class="page-item disabled">
+                <a class="page-link"><i class="fa fa-angle-right"></i></a>
+              </li>
+              {% endif %} 
+            </ul>
+            {% endif %}
+          </nav>
+        </div>
+----------------------------------------------------------------------
+NOW WE WILL WORK ON SEARCH FUNCTIONALITTY
+First make url
+
+<div id="full-page-search">
+  <button type="button" class="close">×</button>
+  <form action="{% url 'teddyBears:search' %}" class="search-header">
+      <input type="search" value="" placeholder="type keyword(s) here. Eg: audi, benz etc" name="keyword"/>
+      <button type="submit" class="btn btn-sm button-theme">Search</button>
+  </form>
+</div>
+
+we add the name to input so whatever the users searches will be Typed
+for example user tpes hi. 
+http://127.0.0.1:8000/teddy-bears/search/?keyword=hi
+
+def search(req):
+    teddybear_data = TeddyBear.objects.order_by('-created_date')
+
+    if 'keyword' in req.GET:  # if we have a keyword name in url
+        # we store keyword's given valuye in keyword variable
+        keyword = req.GET['keyword']
+        if keyword:
+            teddybear_data = teddybear_data.filter(
+                description__icontains=keyword)
+
+    context = {
+        'TeddyBear': teddybear_data
+    }
+
+    return render(req, 'teddyBears/search.html', context)
+----------------------------------------------------------------------
+FOR OUR SEARCH BOX IN MAIN Home
+We want our options to be avalible based on waht is already stored in our database
+
+from pages app
+def home(req):
+    team_data = Team.objects.all()
+    teddy_bear_data = TeddyBear.objects.all()
+    featured_teddy_bears = TeddyBear.objects.order_by(
+        '-created_date').filter(is_featured=True)
+
+    # --search box field looks for those values and passes them to html
+    brand_search = TeddyBear.objects.values_list(
+        'brand', flat=True).distinct().order_by('brand')
+    year_search = TeddyBear.objects.values_list(
+        'year', flat=True).distinct().order_by('year')
+    condition_search = TeddyBear.objects.values_list(
+        'condition', flat=True).distinct().order_by('condition')
+    tag_search = TeddyBear.objects.values_list(
+        'tag', flat=True).distinct().order_by('tag')
+    context = {
+        'Team': team_data,
+        'TeddyBear': teddy_bear_data,
+        'Featured': featured_teddy_bears,
+        'brand_search': brand_search,
+        'year_search': year_search,
+        'condition_search': condition_search,
+        'tag_search': tag_search,
+    }
+    return render(req, 'pages/home.html', context)
+why each topic has its own _search
+  it is because if 2 items in database have the same like city or brand, that wouldn't be shown twice in options here
+
+Now that only works with SEARCHING BY TYPING
+BUT WHAT IF WE ALSO WOULD LIKE TO SEARCH BASED ON GIVEN options
+
+html
+<div class="form-group">
+          <select class="form-control search-fields" name="brand"> <-------------
+            <option selected="true" disabled="disabled">Brand</option>
+            {% for brand in brand_search %}
+            <option value="{{brand}}">{{brand}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+teddyBears.py
+def search(req):
+    teddybear_data = TeddyBear.objects.order_by('-created_date')
+
+    if 'keyword' in req.GET:  # if we have a keyword name in url
+        # we store keyword's given valuye in keyword variable
+        keyword = req.GET['keyword']
+        if keyword:
+            teddybear_data = teddybear_data.filter(
+                description__icontains=keyword)
+
+    if 'brand' in req.GET:  # if we have a keyword name in url  <--------------
+        # we store keyword's given valuye in keyword variable 
+        brand = req.GET['brand']
+        if brand:
+            teddybear_data = teddybear_data.filter(
+                brand__iexact=brand)  # checking it for exact value instead of looking for similar in description
+
+    if 'year' in req.GET:  # if we have a keyword name in url
+        # we store keyword's given valuye in keyword variable
+        year = req.GET['year']
+        if year:
+            teddybear_data = teddybear_data.filter(
+                year__iexact=year)  # checking it for exact value instead of looking for similar in description
+
+    if 'condition' in req.GET:  # if we have a keyword name in url
+        # we store keyword's given valuye in keyword variable
+        condition = req.GET['condition']
+        if condition:
+            teddybear_data = teddybear_data.filter(
+                condition__iexact=condition)  # checking it for exact value instead of looking for similar in description
+
+    if 'tag' in req.GET:  # if we have a keyword name in url
+        # we store keyword's given valuye in keyword variable
+        tag = req.GET['tag']
+        if tag:
+            teddybear_data = teddybear_data.filter(
+                tag__iexact=tag)  # checking it for exact value instead of looking for similar in description
+
+    if 'min_price' in req.GET:
+        min_price = req.GET['min_price']
+        max_price = req.GET['max_price']
+        if max_price:
+            teddybear_data = teddybear_data.filter(
+                price__gte=min_price, price__lte=max_price)
+            # this means price is >= minimum price and <= maximum price
+
+    context = {
+        'TeddyBear': teddybear_data
+    }
+
+    return render(req, 'teddyBears/search.html', context)
+----------------------------------------------------------------------
+CUSTOMIZE ADMIN PAGE CHANGE COLOR
+
+Create folder in template -> admin
+name must be base_site.html in that folder
